@@ -7,6 +7,32 @@ resource "azurerm_resource_group" "rg" {
   name     = "vwan-terraform-rg"
   location = "West Europe"
 }
+#Create a virtual wan
+resource "azurerm_virtual_wan" "demo-vwan" {
+  name                = "demo-vwan"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+#Create a virtual hub & gateway
+resource "azurerm_virtual_hub" "demo-vwan-hub" {
+  name                = "demo-vwan-hub"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_virtual_wan.demo-vwan.location
+  virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
+  address_prefix      = "192.168.0.0/24"
+}
+resource "azurerm_vpn_gateway" "demo-vwan-hub-vpngw" {
+  name                = "demo-vwan-hub-vpngw"
+  location            = azurerm_virtual_hub.demo-vwan-hub.location
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_hub_id      = azurerm_virtual_hub.demo-vwan-hub.id
+  #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
+  #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
+}
+
+#support for vwan child resources (hub-vnet connections etc) in azure_rm provider is in development, see https://github.com/terraform-providers/terraform-provider-azurerm/issues/3279
+#https://github.com/terraform-providers/terraform-provider-azurerm/pull/5004
+
 
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "spoke1" {
