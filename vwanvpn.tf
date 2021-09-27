@@ -155,7 +155,7 @@ resource "azurerm_subnet" "onprem-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-      address_prefix = "10.0.1.0/26"
+      address_prefix = "10.0.1.64/26"
   }
 resource "azurerm_subnet" "onprem-GatewaySubnet"{
       name = "GatewaySubnet"
@@ -167,7 +167,7 @@ resource "azurerm_subnet" "onprem-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-      address_prefix = "172.16.4.224/28"
+      address_prefix = "10.0.1.224/28"
   }
 
 
