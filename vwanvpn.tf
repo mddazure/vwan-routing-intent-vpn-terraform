@@ -35,7 +35,7 @@ resource "azurerm_virtual_hub" "demo-eastus-hub" {
   location            = "eastus"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.1.0/24"
-
+}
 #Create spoke vnet connections
 resource "azurerm_virtual_hub_connection" "spoke1-conn" {
   name                = "spoke1-conn"
