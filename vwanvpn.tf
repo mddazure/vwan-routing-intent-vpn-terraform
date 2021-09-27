@@ -52,7 +52,7 @@ resource "azurerm_virtual_hub_connection" "spoke3-conn" {
   virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
   remote_virtual_network_id = azurerm_virtual_network.spoke3.id
 }
-resource "azurerm_virtual_hub_connection" "spoke1-conn" {
+resource "azurerm_virtual_hub_connection" "spoke4-conn" {
   name                = "spoke4-conn"
   virtual_hub_id      = azurerm_virtual_hub.demo-eastus-hub.id
   remote_virtual_network_id = azurerm_virtual_network.spoke4.id
@@ -219,9 +219,10 @@ resource "azurerm_virtual_network_gateway" "qonprem-gw" {
     name                          = "onprem-gwGatewayConfig"
     public_ip_address_id          = azurerm_public_ip.onprem-gw-pubip.id
     subnet_id                     = azurerm_subnet.onprem-GatewaySubnet.id
-}
+  }
   bgp_settings {
       asn                         = 65514     
+  }
 }
 
 
