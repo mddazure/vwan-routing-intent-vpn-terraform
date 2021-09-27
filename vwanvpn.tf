@@ -20,8 +20,8 @@ resource "azurerm_virtual_hub" "demo-we-hub" {
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.0.0/24"
 }
-resource "azurerm_vpn_gateway" "demo-vwan-hub-vpngw" {
-  name                = "demo-vwan-hub-vpngw"
+resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
+  name                = "demo-we-hub-vpngw"
   location            = azurerm_virtual_hub.demo-we-hub.location
   resource_group_name = azurerm_resource_group.rg.name
   virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
