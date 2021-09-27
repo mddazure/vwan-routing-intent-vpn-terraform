@@ -13,32 +13,58 @@ resource "azurerm_virtual_wan" "demo-vwan" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 }
-#Create a virtual hub & gateway
-resource "azurerm_virtual_hub" "demo-vwan-hub" {
-  name                = "demo-vwan-hub"
+#Create a virtual hub & gateway in West Europe
+resource "azurerm_virtual_hub" "demo-we-hub" {
+  name                = "demo-we-hub"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_virtual_wan.demo-vwan.location
+  location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.0.0/24"
 }
 resource "azurerm_vpn_gateway" "demo-vwan-hub-vpngw" {
   name                = "demo-vwan-hub-vpngw"
-  location            = azurerm_virtual_hub.demo-vwan-hub.location
+  location            = azurerm_virtual_hub.demo-we-hub.location
   resource_group_name = azurerm_resource_group.rg.name
-  virtual_hub_id      = azurerm_virtual_hub.demo-vwan-hub.id
+  virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
   #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
   #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
 }
+#Create a virtual hub in East US
+resource "azurerm_virtual_hub" "demo-eastus-hub" {
+  name                = "demo-eastus-hub"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "eastus"
+  virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
+  address_prefix      = "192.168.1.0/24"
 
-#support for vwan child resources (hub-vnet connections etc) in azure_rm provider is in development, see https://github.com/terraform-providers/terraform-provider-azurerm/issues/3279
-#https://github.com/terraform-providers/terraform-provider-azurerm/pull/5004
+#Create spoke vnet connections
+resource "azurerm_virtual_hub_connection" "spoke1-conn" {
+  name                = "spoke1-conn"
+  virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
+  remote_virtual_network_id = azurerm_virtual_network.spoke1.id
+}
+resource "azurerm_virtual_hub_connection" "spoke2-conn" {
+  name                = "spoke2-conn"
+  virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
+  remote_virtual_network_id = azurerm_virtual_network.spoke2.id
+}
+resource "azurerm_virtual_hub_connection" "spoke3-conn" {
+  name                = "spoke3-conn"
+  virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
+  remote_virtual_network_id = azurerm_virtual_network.spoke3.id
+}
+resource "azurerm_virtual_hub_connection" "spoke1-conn" {
+  name                = "spoke4-conn"
+  virtual_hub_id      = azurerm_virtual_hub.demo-eastus-hub.id
+  remote_virtual_network_id = azurerm_virtual_network.spoke4.id
+}
 
 
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "spoke1" {
   name                = "spoke1"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = "westeurope"
   address_space       = ["172.16.1.0/24"]
   
 }
@@ -66,7 +92,7 @@ resource "azurerm_subnet" "spoke1-subnet1"{
 resource "azurerm_virtual_network" "spoke2" {
   name                = "spoke2"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = "westeurope"
   address_space       = ["172.16.2.0/24"]
   
 }
@@ -93,7 +119,7 @@ resource "azurerm_subnet" "spoke2-subnet1"{
 resource "azurerm_virtual_network" "spoke3" {
   name                = "spoke3"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = "westeurope"
   address_space       = ["172.16.3.0/24"]
   
 }
@@ -113,7 +139,7 @@ resource "azurerm_subnet" "spoke3-subnet1"{
 resource "azurerm_virtual_network" "spoke4" {
   name                = "spoke4"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = "eastus"
   address_space       = ["172.16.4.0/24"]
   
 }
@@ -170,7 +196,7 @@ resource "azurerm_subnet" "onprem-bastionsubnet"{
       address_prefix = "10.0.1.224/28"
   }
 
-
+#Create virtual network gateway
 resource "azurerm_public_ip" "onprem-gw-pubip" {
   name                = "onprem-gw-pubip"
   location            = azurerm_virtual_network.onprem.location
@@ -194,8 +220,12 @@ resource "azurerm_virtual_network_gateway" "qonprem-gw" {
     name                          = "onprem-gwGatewayConfig"
     public_ip_address_id          = azurerm_public_ip.onprem-gw-pubip.id
     subnet_id                     = azurerm_subnet.onprem-GatewaySubnet.id
-  }
 }
+  bgp_settings {
+      asn                         = 65514     
+}
+
+
 
 #create network interfaces
 resource "azurerm_network_interface" "vwan1-nic" {
