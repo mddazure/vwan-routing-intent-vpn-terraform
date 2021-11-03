@@ -36,6 +36,14 @@ resource "azurerm_virtual_hub" "demo-eastus-hub" {
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.1.0/24"
 }
+resource "azurerm_vpn_gateway" "demo-eastus-hub-vpngw" {
+  name                = "demo-eastus-hub-vpngw"
+  location            = azurerm_virtual_hub.demo-eastus-hub.location
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_hub_id      = azurerm_virtual_hub.demo-eastus-hub.id
+  #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
+  #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
+}
 #Create spoke vnet connections
 resource "azurerm_virtual_hub_connection" "spoke1-conn" {
   name                = "spoke1-conn"
