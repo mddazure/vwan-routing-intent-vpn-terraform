@@ -13,7 +13,7 @@ echo "# VWAN: Create remote site"
 az network vpn-site create --ip-address $vnetgwtunnelip1 --name onprem2 -g vwan-terraform-rg --asn $vnetgwasn --bgp-peering-address $vnetgwbgpip1 --virtual-wan demo-vwan --location westeurope --device-model VNETGW --device-vendor Azure --link-speed 100
 
 echo "# VWAN: Create connection - remote site to hub gw"
-az network vpn-gateway connection create --gateway-name demo-we-hub-vpngw --name onprem2 --remote-vpn-site onprem2 -g vwan-terraform-rg --shared-key $sharedkey --enable-bgp true --no-wait
+az network vpn-gateway connection create --gateway-name demo-eastus-hub-vpngw --name onprem2 --remote-vpn-site onprem2 -g vwan-terraform-rg --shared-key $sharedkey --enable-bgp true --no-wait
 
 echo "# VWAN: Get parameters from VWAN Hub GW"
 hubgwtunneladdress=$(az network vpn-gateway show --name demo-eastus-hub-vpngw  -g vwan-terraform-rg --query "bgpSettings.bgpPeeringAddresses[?ipconfigurationId == 'Instance0'].tunnelIpAddresses[0]" --output tsv)
