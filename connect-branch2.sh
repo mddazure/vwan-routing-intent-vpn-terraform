@@ -28,5 +28,5 @@ echo "# create local network gateway"
 az network local-gateway create -g vwan-terraform-rg -n lng2 --gateway-ip-address $hubgwtunneladdress --location eastus --asn $hubgwasn --bgp-peering-address $hubgwbgpaddress
 
 echo "# VNET GW: connect from vnet gw to local network gateway"
-az network vpn-connection create -n to-eastus-hub --vnet-gateway1 qonprem2-gw -g vwan-terraform-rg --local-gateway2 lng2 -l westheurope --shared-key $sharedkey --enable-bgp
+az network vpn-connection create -n to-eastus-hub --vnet-gateway1 qonprem2-gw -g vwan-terraform-rg --local-gateway2 lng2 -l westeurope --shared-key $sharedkey --enable-bgp
 
