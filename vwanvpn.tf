@@ -56,7 +56,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "rule-col-grp" {
   }
 }
 
-/*#Enable routing intent
+#Enable routing intent
 resource "azapi_resource" "we_routeintent" {
   type = "Microsoft.Network/virtualHubs/routingIntent@2022-01-01"
   name = "we_routeintent"
@@ -66,10 +66,10 @@ resource "azapi_resource" "we_routeintent" {
       routingPolicies = [
         {
           destinations = [
-            "string"
+            "PrivateTraffic"
           ]
-          name = "string"
-          nextHop = "string"
+          name = "PrivateTraffic"
+          nextHop = "${azurerm_firewall.we-fw.id}"
         }
       ]
     }
