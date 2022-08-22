@@ -1,6 +1,11 @@
 provider "azurerm" {
 features {}
 }
+
+provider "azureapi" {
+features {}
+}
+
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
   name     = "vwan-terraform-rg"
