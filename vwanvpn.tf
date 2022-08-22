@@ -2,7 +2,7 @@ provider "azurerm" {
 features {}
 }
 
-provider "azureapi" {
+provider "azapi" {
 features {}
 }
 
