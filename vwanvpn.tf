@@ -385,8 +385,31 @@ resource "azurerm_windows_virtual_machine" "vwan1" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
-  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+  #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+
+  source_image_reference {
+    offer     = "WindowsServer"
+    publisher = "MicrosoftWindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
 }
+resource "azurerm_virtual_machine_extension" "install-iis-vwan1" {
+    
+  name                 = "install-iis-vwan1"
+  virtual_machine_id   = azurerm_windows_virtual_machine.vwan1.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+   settings = <<SETTINGS
+    {
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
+    }
+SETTINGS
+}
+
+
 resource "azurerm_windows_virtual_machine" "vwan4" {
   name                = "vwan1"
   resource_group_name = azurerm_resource_group.rg.name
@@ -402,8 +425,31 @@ resource "azurerm_windows_virtual_machine" "vwan4" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
-  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+  #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+  
+  source_image_reference {
+    offer     = "WindowsServer"
+    publisher = "MicrosoftWindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
 }
+resource "azurerm_virtual_machine_extension" "install-iis-vwan4" {
+    
+  name                 = "install-iis-vwan4"
+  virtual_machine_id   = azurerm_windows_virtual_machine.vwan4.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+   settings = <<SETTINGS
+    {
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
+    }
+SETTINGS
+}
+
+
 /*
 resource "azurerm_windows_virtual_machine" "onprem" {
   name                = "onprem"
