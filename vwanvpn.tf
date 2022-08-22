@@ -67,7 +67,6 @@ resource "azurerm_firewall_policy_rule_collection_group" "rule-col-grp" {
     }
   }
 }
-
 #Enable routing intent
 resource "azapi_resource" "we_routeintent" {
   type = "Microsoft.Network/virtualHubs/routingIntent@2022-01-01"
@@ -104,7 +103,39 @@ resource "azurerm_virtual_hub" "demo-eastus-hub" {
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.1.0/24"
-}/*
+}
+resource "azurerm_firewall" "eastus-fw" {
+  name                = "eastus-fw"
+  location = azurerm_virtual_hub.demo-eastus-hub.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku_name = "AZFW_Hub"
+  sku_tier = "Premium"
+  firewall_policy_id = azurerm_firewall_policy.fw-pol.id
+  virtual_hub {
+    virtual_hub_id = azurerm_virtual_hub.demo-eastus-hub.id
+  }
+}
+resource "azapi_resource" "eastus_routeintent" {
+  type = "Microsoft.Network/virtualHubs/routingIntent@2022-01-01"
+  name = "eastus_routeintent"
+  parent_id = azurerm_virtual_hub.demo-eastus-hub.id
+  body = jsonencode({
+    properties = {
+      routingPolicies = [
+        {
+          destinations = [
+            "PrivateTraffic"
+          ]
+          name = "PrivateTraffic"
+          nextHop = "${azurerm_firewall.eastus-fw.id}"
+        }
+      ]
+    }
+  })
+}
+
+
+/*
 resource "azurerm_vpn_gateway" "demo-eastus-hub-vpngw" {
   name                = "demo-eastus-hub-vpngw"
   location            = azurerm_virtual_hub.demo-eastus-hub.location
