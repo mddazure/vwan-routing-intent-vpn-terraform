@@ -232,7 +232,7 @@ resource "azurerm_subnet" "spoke3-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke3.name
-      address_prefixex = ["172.16.3.0/26"]
+      address_prefixes = ["172.16.3.0/26"]
   }
   resource "azurerm_subnet" "spoke3-subnet2"{
       name = "subnet2"
@@ -376,8 +376,7 @@ resource "azurerm_windows_virtual_machine" "vwan1" {
   location            = azurerm_virtual_network.spoke1.location
   size                = "Standard_D2s_v3"
   admin_username      = "marc"
-  disable_password_authentication = false
-   admin_password = "Nienke040598"
+  admin_password = "Nienke040598"
   network_interface_ids = [
     azurerm_network_interface.vwan1-nic.id,
   ]
@@ -394,8 +393,7 @@ resource "azurerm_windows_virtual_machine" "vwan4" {
   location            = azurerm_virtual_network.spoke1.location
   size                = "Standard_D2s_v3"
   admin_username      = "marc"
-  disable_password_authentication = false
-   admin_password = "Nienke040598"
+  admin_password = "Nienke040598"
   network_interface_ids = [
     azurerm_network_interface.vwan1-nic.id,
   ]
