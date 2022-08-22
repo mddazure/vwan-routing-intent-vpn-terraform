@@ -418,7 +418,7 @@ resource "azurerm_windows_virtual_machine" "vwan4" {
   admin_username      = "marc"
   admin_password = "Nienke040598"
   network_interface_ids = [
-    azurerm_network_interface.vwan1-nic.id,
+    azurerm_network_interface.vwan4-nic.id,
   ]
   
   os_disk {
