@@ -411,7 +411,7 @@ SETTINGS
 
 
 resource "azurerm_windows_virtual_machine" "vwan4" {
-  name                = "vwan1"
+  name                = "vwan4"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_virtual_network.spoke1.location
   size                = "Standard_D2s_v3"
