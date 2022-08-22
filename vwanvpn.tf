@@ -26,7 +26,7 @@ resource "azurerm_firewall" "we-fw" {
   resource_group_name = azurerm_resource_group.rg.name
   sku_name = "AZFW_Hub"
   sku_tier = "Premium"
-  firewall_policy_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourcegroups/firewall-policy/providers/Microsoft.Network/firewallPolicies/premium-policy"
+  firewall_policy_id = azurerm_firewall_policy.fw-pol.id
   virtual_hub {
     virtual_hub_id = azurerm_virtual_hub.demo-we-hub.id
   }
