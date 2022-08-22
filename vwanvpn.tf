@@ -31,7 +31,30 @@ resource "azurerm_firewall" "we-fw" {
     virtual_hub_id = azurerm_virtual_hub.demo-we-hub.id
   }
 }
+resource "azurerm_firewall_policy" "fw-pol"{
+  name = "fw-pol"
+  location = azurerm_virtual_hub.demo-we-hub.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku = "Premium"
+}
+resource "azurerm_firewall_policy_rule_collection_group" "rule-col-grp" {
+  name               = "rule-col-grp"
+  firewall_policy_id = azurerm_firewall_policy.fw-pol.id
+  priority           = 500
 
+    network_rule_collection {
+    name     = "network_rule_collection1"
+    priority = 400
+    action   = "Allow"
+    rule {
+      name                  = "network_rule_collection1_rule1"
+      protocols             = ["TCP", "UDP"]
+      source_addresses      = ["172.16.1.0/24"]
+      destination_addresses = ["172.16.2.0/24"]
+      destination_ports     = ["80", "443"]
+    }
+  }
+}
 
 /*#Enable routing intent
 resource "azapi_resource" "we_routeintent" {
