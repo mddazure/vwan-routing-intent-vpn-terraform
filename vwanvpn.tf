@@ -413,7 +413,7 @@ SETTINGS
 resource "azurerm_windows_virtual_machine" "vwan4" {
   name                = "vwan4"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_virtual_network.spoke1.location
+  location            = azurerm_virtual_network.spoke4.location
   size                = "Standard_D2s_v3"
   admin_username      = "marc"
   admin_password = "Nienke040598"
