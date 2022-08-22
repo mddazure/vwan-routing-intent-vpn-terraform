@@ -11,7 +11,6 @@ features {}
 }
 
 provider "azapi" {
-features {}
 }
 
 # Create a resource group
