@@ -177,20 +177,20 @@ resource "azurerm_subnet" "spoke1-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke1.name
-      address_prefix = "172.16.1.0/26"
+      address_prefixes = ["172.16.1.0/26"]
   }
   resource "azurerm_subnet" "spoke1-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke1.name
-      address_prefix = "172.16.1.64/26"
+      address_prefixes = ["172.16.1.64/26"]
   }
  
   resource "azurerm_subnet" "spoke1-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke1.name
-            address_prefix = "172.16.1.224/28"
+            address_prefixes = ["172.16.1.224/28"]
   }
 
 # Create a virtual network within the resource group
@@ -205,19 +205,19 @@ resource "azurerm_subnet" "spoke2-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke2.name
-      address_prefix = "172.16.2.0/26"
+      address_prefixes = ["172.16.2.0/26"]
   }
   resource "azurerm_subnet" "spoke2-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke2.name
-      address_prefix = "172.16.2.64/26"
+      address_prefixes = ["172.16.2.64/26"]
   }
   resource "azurerm_subnet" "spoke2-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke2.name
-            address_prefix = "172.16.2.224/28"
+      address_prefixes = ["172.16.2.224/28"]
   }
 
 # Create a virtual network within the resource group
@@ -232,13 +232,13 @@ resource "azurerm_subnet" "spoke3-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke3.name
-      address_prefix = "172.16.3.0/26"
+      address_prefixex = ["172.16.3.0/26"]
   }
   resource "azurerm_subnet" "spoke3-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke3.name
-      address_prefix = "172.16.3.64/26"
+      address_prefixes = ["172.16.3.64/26"]
   }
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "spoke4" {
@@ -252,19 +252,19 @@ resource "azurerm_subnet" "spoke4-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
-      address_prefix = "172.16.4.0/26"
+      address_prefixes = ["172.16.4.0/26"]
   }
 resource "azurerm_subnet" "spoke4-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
-      address_prefix = "172.16.4.64/26"
+      address_prefixes = ["172.16.4.64/26"]
   }
 resource "azurerm_subnet" "spoke4-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
-      address_prefix = "172.16.4.224/28"
+      address_prefixes = ["172.16.4.224/28"]
   }
 
 /*
