@@ -20,6 +20,39 @@ resource "azurerm_virtual_hub" "demo-we-hub" {
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.0.0/24"
 }
+resource "azurerm_firewall" "we-fw" {
+  name                = "we-fw"
+  location = azurerm_virtual_hub.demo-we-hub.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku_name = "AZFW_Hub"
+  sku_tier = "Premium"
+  firewall_policy_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourcegroups/firewall-policy/providers/Microsoft.Network/firewallPolicies/premium-policy"
+  virtual_hub {
+    virtual_hub_id = azurerm_virtual_hub.demo-we-hub.id
+  }
+}
+
+
+/*#Enable routing intent
+resource "azapi_resource" "we_routeintent" {
+  type = "Microsoft.Network/virtualHubs/routingIntent@2022-01-01"
+  name = "we_routeintent"
+  parent_id = azurerm_virtual_hub.demo-we-hub.id
+  body = jsonencode({
+    properties = {
+      routingPolicies = [
+        {
+          destinations = [
+            "string"
+          ]
+          name = "string"
+          nextHop = "string"
+        }
+      ]
+    }
+  })
+}
+/*
 resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
   name                = "demo-we-hub-vpngw"
   location            = azurerm_virtual_hub.demo-we-hub.location
@@ -27,15 +60,16 @@ resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
   virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
   #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
   #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
-}
-#Create a virtual hub in East US
+}*/
+#Create a virtual hub in East US (West Europe)
 resource "azurerm_virtual_hub" "demo-eastus-hub" {
   name                = "demo-eastus-hub"
   resource_group_name = azurerm_resource_group.rg.name
-  location            = "eastus"
+  #location            = "eastus"
+  location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.1.0/24"
-}
+}/*
 resource "azurerm_vpn_gateway" "demo-eastus-hub-vpngw" {
   name                = "demo-eastus-hub-vpngw"
   location            = azurerm_virtual_hub.demo-eastus-hub.location
@@ -247,6 +281,17 @@ resource "azurerm_network_interface" "vwan1-nic" {
     private_ip_address_allocation = "Dynamic"
   }
 }
+resource "azurerm_network_interface" "vwan4-nic" {
+  name                = "vwan4-nic"
+  location            = azurerm_virtual_network.spoke4.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.spoke4-subnet1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
 resource "azurerm_network_interface" "onprem-nic" {
   name                = "onprem-nic"
   location            = azurerm_virtual_network.onprem.location
@@ -259,7 +304,7 @@ resource "azurerm_network_interface" "onprem-nic" {
   }
 }
 #create vms
-resource "azurerm_linux_virtual_machine" "vwan1" {
+resource "azurerm_windows_virtual_machine" "vwan1" {
   name                = "vwan1"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_virtual_network.spoke1.location
@@ -275,16 +320,29 @@ resource "azurerm_linux_virtual_machine" "vwan1" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
+  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
 }
-resource "azurerm_linux_virtual_machine" "onprem" {
-  name                = "qremote"
+resource "azurerm_linux_virtual_machine" "vwan4" {
+  name                = "vwan1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_virtual_network.spoke1.location
+  size                = "Standard_D2s_v3"
+  admin_username      = "marc"
+  disable_password_authentication = false
+   admin_password = "Nienke040598"
+  network_interface_ids = [
+    azurerm_network_interface.vwan1-nic.id,
+  ]
+  
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_LRS"
+  }
+  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+}
+
+resource "azurerm_windows_virtual_machine" "onprem" {
+  name                = "onprem"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_virtual_network.onprem.location
   size                = "Standard_D2s_v3"
@@ -299,13 +357,7 @@ resource "azurerm_linux_virtual_machine" "onprem" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
+  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
 }
 #create bastion
 resource "azurerm_public_ip" "onprem-bastion-pubip" {
@@ -343,4 +395,4 @@ resource "azurerm_bastion_host" "qremote-bastion" {
     subnet_id            = azurerm_subnet.onprem-bastionsubnet.id
     public_ip_address_id = azurerm_public_ip.onprem-bastion-pubip.id
   }
-}
+}*/
