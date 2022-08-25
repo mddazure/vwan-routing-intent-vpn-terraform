@@ -30,7 +30,7 @@ resource "azurerm_virtual_hub" "demo-we-hub" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
-  address_prefixes      = ["192.168.0.0/24"]
+  address_prefix     = "192.168.0.0/24"
 }
 resource "azurerm_firewall" "we-fw" {
   name                = "we-fw"
@@ -102,7 +102,7 @@ resource "azurerm_virtual_hub" "demo-eastus-hub" {
   #location            = "eastus" -> change when interregion available
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
-  address_prefixes      = ["192.168.1.0/24"]
+  address_prefix     = "192.168.1.0/24"
 }
 resource "azurerm_firewall" "eastus-fw" {
   name                = "eastus-fw"
