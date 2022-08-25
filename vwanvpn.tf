@@ -443,8 +443,7 @@ resource "azurerm_windows_virtual_machine" "onprem" {
   location            = azurerm_virtual_network.onprem.location
   size                = "Standard_D2s_v3"
   admin_username      = "marc"
-  disable_password_authentication = false
-   admin_password = "Nienke040598"
+  admin_password = "Nienke040598"
   network_interface_ids = [
     azurerm_network_interface.onprem-nic.id,
   ]
