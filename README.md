@@ -4,7 +4,7 @@ Documentation: [How to configure Virtual WAN Hub routing intent and routing poli
 
 Pre-GA:
 - Both Hubs are deployed in West Europe. 
-- Portal should be accessed at aka.ms/interhub to view Routing Intent settings in Firewall Manager
+- Access portal at aka.ms/interhub to view Routing Intent settings in Firewall Manager
 
 ## Topology
 
