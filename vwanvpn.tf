@@ -15,7 +15,7 @@ provider "azapi" {
 
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
-  name     = "vwan-terraform-rg"
+  name     = "vwan-ri-terraform-rg"
   location = "West Europe"
 }
 #Create a virtual wan
@@ -86,7 +86,7 @@ resource "azapi_resource" "we_routeintent" {
     }
   })
 }
-/*
+
 resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
   name                = "demo-we-hub-vpngw"
   location            = azurerm_virtual_hub.demo-we-hub.location
@@ -94,12 +94,12 @@ resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
   virtual_hub_id      = azurerm_virtual_hub.demo-we-hub.id
   #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
   #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
-}*/
+}
 #Create a virtual hub in East US (West Europe)
 resource "azurerm_virtual_hub" "demo-eastus-hub" {
   name                = "demo-eastus-hub"
   resource_group_name = azurerm_resource_group.rg.name
-  #location            = "eastus"
+  #location            = "eastus" -> change when interregion available
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix      = "192.168.1.0/24"
@@ -133,8 +133,6 @@ resource "azapi_resource" "eastus_routeintent" {
     }
   })
 }
-
-/*
 resource "azurerm_vpn_gateway" "demo-eastus-hub-vpngw" {
   name                = "demo-eastus-hub-vpngw"
   location            = azurerm_virtual_hub.demo-eastus-hub.location
@@ -142,7 +140,7 @@ resource "azurerm_vpn_gateway" "demo-eastus-hub-vpngw" {
   virtual_hub_id      = azurerm_virtual_hub.demo-eastus-hub.id
   #public ip address of vpn gateway is not exposed, can only be retrieved from exported site configuration file after creation of gateway
   #it is therefore not possible to automate vpn-gateway to vnet-gateway s2s vpn connection
-}*/
+}
 #Create spoke vnet connections
 resource "azurerm_virtual_hub_connection" "spoke1-conn" {
   name                = "spoke1-conn"
@@ -207,7 +205,7 @@ resource "azurerm_subnet" "spoke2-subnet1"{
       virtual_network_name = azurerm_virtual_network.spoke2.name
       address_prefixes = ["172.16.2.0/26"]
   }
-  resource "azurerm_subnet" "spoke2-subnet2"{
+ resource "azurerm_subnet" "spoke2-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke2.name
@@ -248,26 +246,24 @@ resource "azurerm_virtual_network" "spoke4" {
   address_space       = ["172.16.4.0/24"]
   
 }
-resource "azurerm_subnet" "spoke4-subnet1"{
+  resource "azurerm_subnet" "spoke4-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
       address_prefixes = ["172.16.4.0/26"]
   }
-resource "azurerm_subnet" "spoke4-subnet2"{
+  resource "azurerm_subnet" "spoke4-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
       address_prefixes = ["172.16.4.64/26"]
   }
-resource "azurerm_subnet" "spoke4-bastionsubnet"{
+  resource "azurerm_subnet" "spoke4-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.spoke4.name
       address_prefixes = ["172.16.4.224/28"]
   }
-
-/*
 # Create a virtual network within the resource group
 resource "azurerm_virtual_network" "onprem" {
   name                = "onprem"
@@ -330,9 +326,6 @@ resource "azurerm_virtual_network_gateway" "qonprem-gw" {
       asn                         = 65514     
   }
 }
-*/
-
-
 #create network interfaces
 resource "azurerm_network_interface" "vwan1-nic" {
   name                = "vwan1-nic"
@@ -356,7 +349,6 @@ resource "azurerm_network_interface" "vwan4-nic" {
     private_ip_address_allocation = "Dynamic"
   }
 }
-/*
 resource "azurerm_network_interface" "onprem-nic" {
   name                = "onprem-nic"
   location            = azurerm_virtual_network.onprem.location
@@ -368,7 +360,6 @@ resource "azurerm_network_interface" "onprem-nic" {
     private_ip_address_allocation = "Dynamic"
   }
 }
-*/
 #create vms
 resource "azurerm_windows_virtual_machine" "vwan1" {
   name                = "vwan1"
@@ -408,8 +399,6 @@ resource "azurerm_virtual_machine_extension" "install-iis-vwan1" {
     }
 SETTINGS
 }
-
-
 resource "azurerm_windows_virtual_machine" "vwan4" {
   name                = "vwan4"
   resource_group_name = azurerm_resource_group.rg.name
@@ -448,9 +437,6 @@ resource "azurerm_virtual_machine_extension" "install-iis-vwan4" {
     }
 SETTINGS
 }
-
-
-/*
 resource "azurerm_windows_virtual_machine" "onprem" {
   name                = "onprem"
   resource_group_name = azurerm_resource_group.rg.name
@@ -467,7 +453,14 @@ resource "azurerm_windows_virtual_machine" "onprem" {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
-  source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+  source_image_reference {
+    offer     = "WindowsServer"
+    publisher = "MicrosoftWindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
+
+  #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
 }
 #create bastion
 resource "azurerm_public_ip" "onprem-bastion-pubip" {
@@ -476,8 +469,7 @@ resource "azurerm_public_ip" "onprem-bastion-pubip" {
   resource_group_name = azurerm_resource_group.rg.name
   sku = "Standard"
   allocation_method = "Static"
-}*/
-
+}
 resource "azurerm_public_ip" "spoke1-bastion-pubip" {
   name                = "spoke1-bastion-pubip"
   location            = azurerm_virtual_network.spoke1.location
@@ -496,9 +488,8 @@ resource "azurerm_bastion_host" "spoke1-bastion" {
     public_ip_address_id = azurerm_public_ip.spoke1-bastion-pubip.id
   }
 }
-/*
-resource "azurerm_bastion_host" "qremote-bastion" {
-  name                = "qremote-bastion"
+resource "azurerm_bastion_host" "onprem-bastion" {
+  name                = "onprem-bastion"
   location            = azurerm_virtual_network.onprem.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -507,4 +498,4 @@ resource "azurerm_bastion_host" "qremote-bastion" {
     subnet_id            = azurerm_subnet.onprem-bastionsubnet.id
     public_ip_address_id = azurerm_public_ip.onprem-bastion-pubip.id
   }
-}*/
+}

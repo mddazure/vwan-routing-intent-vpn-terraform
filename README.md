@@ -1,4 +1,10 @@
-# VWAN with Terraform
+# VWAN with Routing Intenet deployed through Terraform
+
+Documentation: [How to configure Virtual WAN Hub routing intent and routing policies](https://docs.microsoft.com/en-us/azure/virtual-wan/how-to-routing-policies) 
+
+Pre-GA:
+- Both Hubs are deployed in West Europe. 
+- Portal should be accessed at aka.ms/interhub to view Routing Intent settings in Firewall Manager
 
 ## Topology
 
@@ -19,11 +25,11 @@ In Cloud Shell:
   
 - Clone the  GitHub repository:
   
-  `git clone https://github.com/mddazure/vwan-vpn-terraform`
+  `git clone https://github.com/mddazure/vwan-routing-intent-vpn-terraform`
   
   - Change directory:
   
-  `cd ./vwan-vpn-terraform`
+  `cd ./vwan-routing-intent-vpn-terraform`
   - Initialize terraform and download the azurerm resource provider:
 
   `terraform init`
