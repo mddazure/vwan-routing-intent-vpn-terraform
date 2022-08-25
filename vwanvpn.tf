@@ -30,7 +30,7 @@ resource "azurerm_virtual_hub" "demo-we-hub" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
-  address_prefix      = "192.168.0.0/24"
+  address_prefixes      = ["192.168.0.0/24"]
 }
 resource "azurerm_firewall" "we-fw" {
   name                = "we-fw"
@@ -102,7 +102,7 @@ resource "azurerm_virtual_hub" "demo-eastus-hub" {
   #location            = "eastus" -> change when interregion available
   location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
-  address_prefix      = "192.168.1.0/24"
+  address_prefixes      = ["192.168.1.0/24"]
 }
 resource "azurerm_firewall" "eastus-fw" {
   name                = "eastus-fw"
@@ -276,25 +276,25 @@ resource "azurerm_subnet" "onprem-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-      address_prefix = "10.0.1.0/26"
+      address_prefixes = ["10.0.1.0/26"]
   }
 resource "azurerm_subnet" "onprem-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-      address_prefix = "10.0.1.64/26"
+      address_prefixes = ["10.0.1.64/26"]
   }
 resource "azurerm_subnet" "onprem-GatewaySubnet"{
       name = "GatewaySubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-            address_prefix = "10.0.1.240/28"
+      address_prefixes = ["10.0.1.240/28"]
 }
 resource "azurerm_subnet" "onprem-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
       virtual_network_name = azurerm_virtual_network.onprem.name
-      address_prefix = "10.0.1.224/28"
+      address_prefixes = ["10.0.1.224/28"]
   }
 
 #Create virtual network gateway
