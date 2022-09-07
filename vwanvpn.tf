@@ -308,25 +308,25 @@ resource "azurerm_virtual_network" "onprem2" {
 resource "azurerm_subnet" "onprem2-subnet1"{
       name = "subnet1"
       resource_group_name = azurerm_resource_group.rg.name
-      virtual_network_name = azurerm_virtual_network.onprem.name
+      virtual_network_name = azurerm_virtual_network.onprem2.name
       address_prefixes = ["10.0.2.0/26"]
   }
 resource "azurerm_subnet" "onprem2-subnet2"{
       name = "subnet2"
       resource_group_name = azurerm_resource_group.rg.name
-      virtual_network_name = azurerm_virtual_network.onprem.name
+      virtual_network_name = azurerm_virtual_network.onprem2.name
       address_prefixes = ["10.0.2.64/26"]
   }
 resource "azurerm_subnet" "onprem2-GatewaySubnet"{
       name = "GatewaySubnet"
       resource_group_name = azurerm_resource_group.rg.name
-      virtual_network_name = azurerm_virtual_network.onprem.name
+      virtual_network_name = azurerm_virtual_network.onprem2.name
       address_prefixes = ["10.0.2.240/28"]
 }
 resource "azurerm_subnet" "onprem2-bastionsubnet"{
       name = "AzureBastionSubnet"
       resource_group_name = azurerm_resource_group.rg.name
-      virtual_network_name = azurerm_virtual_network.onprem.name
+      virtual_network_name = azurerm_virtual_network.onprem2.name
       address_prefixes = ["10.0.2.224/28"]
   }
 
