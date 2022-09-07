@@ -535,6 +535,20 @@ resource "azurerm_windows_virtual_machine" "onprem" {
 
   #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
 }
+resource "azurerm_virtual_machine_extension" "install-iis-onprem" {
+    
+  name                 = "install-iis-onprem"
+  virtual_machine_id   = azurerm_windows_virtual_machine.onprem.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+   settings = <<SETTINGS
+    {
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
+    }
+SETTINGS
+}
 resource "azurerm_windows_virtual_machine" "onprem2" {
   name                = "onprem2"
   resource_group_name = azurerm_resource_group.rg.name
@@ -558,6 +572,20 @@ resource "azurerm_windows_virtual_machine" "onprem2" {
   }
 
   #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+}
+resource "azurerm_virtual_machine_extension" "install-iis-onprem2" {
+    
+  name                 = "install-iis-onprem2"
+  virtual_machine_id   = azurerm_windows_virtual_machine.onprem2.id
+  publisher            = "Microsoft.Compute"
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
+
+   settings = <<SETTINGS
+    {
+        "commandToExecute":"powershell -ExecutionPolicy Unrestricted Add-WindowsFeature Web-Server; powershell -ExecutionPolicy Unrestricted Add-Content -Path \"C:\\inetpub\\wwwroot\\Default.htm\" -Value $($env:computername)"
+    }
+SETTINGS
 }
 #create bastion
 resource "azurerm_public_ip" "onprem-bastion-pubip" {
