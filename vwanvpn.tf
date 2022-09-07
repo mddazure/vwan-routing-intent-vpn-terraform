@@ -297,6 +297,39 @@ resource "azurerm_subnet" "onprem-bastionsubnet"{
       address_prefixes = ["10.0.1.224/28"]
   }
 
+# Create a virtual network within the resource group
+resource "azurerm_virtual_network" "onprem2" {
+  name                = "onprem2"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = "westeurope"
+  address_space       = ["10.0.2.0/24"]
+  
+}
+resource "azurerm_subnet" "onprem2-subnet1"{
+      name = "subnet1"
+      resource_group_name = azurerm_resource_group.rg.name
+      virtual_network_name = azurerm_virtual_network.onprem.name
+      address_prefixes = ["10.0.2.0/26"]
+  }
+resource "azurerm_subnet" "onprem2-subnet2"{
+      name = "subnet2"
+      resource_group_name = azurerm_resource_group.rg.name
+      virtual_network_name = azurerm_virtual_network.onprem.name
+      address_prefixes = ["10.0.2.64/26"]
+  }
+resource "azurerm_subnet" "onprem2-GatewaySubnet"{
+      name = "GatewaySubnet"
+      resource_group_name = azurerm_resource_group.rg.name
+      virtual_network_name = azurerm_virtual_network.onprem.name
+      address_prefixes = ["10.0.2.240/28"]
+}
+resource "azurerm_subnet" "onprem2-bastionsubnet"{
+      name = "AzureBastionSubnet"
+      resource_group_name = azurerm_resource_group.rg.name
+      virtual_network_name = azurerm_virtual_network.onprem.name
+      address_prefixes = ["10.0.2.224/28"]
+  }
+
 #Create virtual network gateway
 resource "azurerm_public_ip" "onprem-gw-pubip" {
   name                = "onprem-gw-pubip"
@@ -326,6 +359,36 @@ resource "azurerm_virtual_network_gateway" "qonprem-gw" {
       asn                         = 65514     
   }
 }
+#Create virtual network gateway
+resource "azurerm_public_ip" "onprem2-gw-pubip" {
+  name                = "onprem2-gw-pubip"
+  location            = azurerm_virtual_network.onprem2.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  allocation_method = "Dynamic"
+}
+resource "azurerm_virtual_network_gateway" "qonprem2-gw" {
+  name                = "qonprem2-gw"
+  location            = azurerm_virtual_network.onprem2.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  type     = "Vpn"
+  vpn_type = "RouteBased"
+
+  active_active = false
+  enable_bgp    = true
+  sku           = "VpnGw1"
+
+  ip_configuration {
+    name                          = "onprem2-gwGatewayConfig"
+    public_ip_address_id          = azurerm_public_ip.onprem2-gw-pubip.id
+    subnet_id                     = azurerm_subnet.onprem2-GatewaySubnet.id
+  }
+  bgp_settings {
+      asn                         = 65513     
+  }
+}
+
 #create network interfaces
 resource "azurerm_network_interface" "vwan1-nic" {
   name                = "vwan1-nic"
@@ -357,6 +420,17 @@ resource "azurerm_network_interface" "onprem-nic" {
   ip_configuration {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.onprem-subnet1.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+resource "azurerm_network_interface" "onprem2-nic" {
+  name                = "onprem2-nic"
+  location            = azurerm_virtual_network.onprem2.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.onprem2-subnet1.id
     private_ip_address_allocation = "Dynamic"
   }
 }
@@ -461,10 +535,41 @@ resource "azurerm_windows_virtual_machine" "onprem" {
 
   #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
 }
+resource "azurerm_windows_virtual_machine" "onprem2" {
+  name                = "onprem2"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_virtual_network.onprem2.location
+  size                = "Standard_D2s_v3"
+  admin_username      = "marc"
+  admin_password = "Nienke040598"
+  network_interface_ids = [
+    azurerm_network_interface.onprem2-nic.id,
+  ]
+  
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "StandardSSD_LRS"
+  }
+  source_image_reference {
+    offer     = "WindowsServer"
+    publisher = "MicrosoftWindowsServer"
+    sku       = "2022-datacenter-azure-edition"
+    version   = "latest"
+  }
+
+  #source_image_id = "/subscriptions/0245be41-c89b-4b46-a3cc-a705c90cd1e8/resourceGroups/image-gallery-rg/providers/Microsoft.Compute/galleries/mddimagegallery/images/windows2019-networktools/versions/2.0.0"
+}
 #create bastion
 resource "azurerm_public_ip" "onprem-bastion-pubip" {
   name                = "onprem-bastion-pubip"
   location            = azurerm_virtual_network.onprem.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku = "Standard"
+  allocation_method = "Static"
+}
+resource "azurerm_public_ip" "onprem2-bastion-pubip" {
+  name                = "onprem2-bastion-pubip"
+  location            = azurerm_virtual_network.onprem2.location
   resource_group_name = azurerm_resource_group.rg.name
   sku = "Standard"
   allocation_method = "Static"
@@ -496,5 +601,16 @@ resource "azurerm_bastion_host" "onprem-bastion" {
     name                 = "configuration"
     subnet_id            = azurerm_subnet.onprem-bastionsubnet.id
     public_ip_address_id = azurerm_public_ip.onprem-bastion-pubip.id
+  }
+}
+resource "azurerm_bastion_host" "onprem2-bastion" {
+  name                = "onprem2-bastion"
+  location            = azurerm_virtual_network.onprem2.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                 = "configuration"
+    subnet_id            = azurerm_subnet.onprem2-bastionsubnet.id
+    public_ip_address_id = azurerm_public_ip.onprem2-bastion-pubip.id
   }
 }
