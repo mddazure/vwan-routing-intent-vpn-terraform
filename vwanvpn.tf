@@ -65,6 +65,13 @@ resource "azurerm_firewall_policy_rule_collection_group" "rule-col-grp" {
       destination_addresses = ["172.16.2.0/24"]
       destination_ports     = ["80", "443"]
     }
+    rule {
+      name                  = "network_rule_collection1_rule2"
+      protocols             = ["TCP", "UDP"]
+      source_addresses      = ["10.0.2.0/24"]
+      destination_addresses = ["10.0.1.0/24,172.16.4.0/24"]
+      destination_ports     = ["*"]
+    }
   }
 }
 #Enable routing intent
