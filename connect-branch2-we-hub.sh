@@ -28,4 +28,4 @@ hubgwkey=$(az network vpn-gateway connection show --gateway-name demo-we-hub-vpn
 #az network local-gateway create -g vwan-ri-terraform-rg -n lng2 --gateway-ip-address $hubgwtunneladdress --location eastus --asn $hubgwasn --bgp-peering-address $hubgwbgpaddress
 
 echo "# VNET GW: connect from vnet gw to local network gateway"
-az network vpn-connection create -n to-we-hub --vnet-gateway1 qonprem2-gw -g vwan-ri-terraform-rg --local-gateway2 lng -l westeurope --shared-key $sharedkey --enable-bgp
+az network vpn-connection create -n onprem2-to-we-hub --vnet-gateway1 qonprem2-gw -g vwan-ri-terraform-rg --local-gateway2 lng -l westeurope --shared-key $sharedkey --enable-bgp
