@@ -14,8 +14,6 @@ az network vpn-site create --ip-address $vnetgwtunnelip1 --name onprem2 -g vwan-
 
 echo "# VWAN: Create connection - remote site to hub gw"
 az network vpn-gateway connection create --gateway-name demo-eastus-hub-vpngw --name onprem2-eastus --remote-vpn-site onprem2 -g vwan-ri-terraform-rg --shared-key $sharedkey --enable-bgp true --no-wait
-az network vpn-gateway connection create --gateway-name demo-we-hub-vpngw --name onprem2-we --remote-vpn-site onprem2 -g vwan-ri-terraform-rg --shared-key $sharedkey --enable-bgp true --no-wait
-
 
 echo "# VWAN: Get parameters from VWAN Hub GW"
 hubgwtunneladdress=$(az network vpn-gateway show --name demo-eastus-hub-vpngw  -g vwan-ri-terraform-rg --query "bgpSettings.bgpPeeringAddresses[?ipconfigurationId == 'Instance0'].tunnelIpAddresses[0]" --output tsv)
@@ -31,5 +29,3 @@ az network local-gateway create -g vwan-ri-terraform-rg -n lng2 --gateway-ip-add
 
 echo "# VNET GW: connect from vnet gw to local network gateway"
 az network vpn-connection create -n to-eastus-hub --vnet-gateway1 qonprem2-gw -g vwan-ri-terraform-rg --local-gateway2 lng2 -l westeurope --shared-key $sharedkey --enable-bgp
-az network vpn-connection create -n to-we-hub --vnet-gateway1 qonprem2-gw -g vwan-ri-terraform-rg --local-gateway2 lng -l westeurope --shared-key $sharedkey --enable-bgp
-
