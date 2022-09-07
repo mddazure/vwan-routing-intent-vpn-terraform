@@ -22,7 +22,7 @@ hubgwbgpaddress=$(az network vpn-gateway show --name demo-we-hub-vpngw  -g vwan-
 echo "Hub GW BGP address:" $hubgwbgpaddress
 hubgwasn=$(az network vpn-gateway show --name demo-we-hub-vpngw  -g vwan-ri-terraform-rg --query "bgpSettings.asn" --output tsv)
 echo "Hub GW BGP ASN:" $hubgwasn
-hubgwkey=$(az network vpn-gateway connection show --gateway-name demo-we-hub-vpngw --name onprem2 -g vwan-ri-terraform-rg --query "sharedKey" --output tsv)
+hubgwkey=$(az network vpn-gateway connection show --gateway-name demo-we-hub-vpngw --name onprem2-we -g vwan-ri-terraform-rg --query "sharedKey" --output tsv)
 
 #echo "# create local network gateway"
 #az network local-gateway create -g vwan-ri-terraform-rg -n lng2 --gateway-ip-address $hubgwtunneladdress --location eastus --asn $hubgwasn --bgp-peering-address $hubgwbgpaddress
