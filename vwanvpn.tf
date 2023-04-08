@@ -15,7 +15,7 @@ provider "azapi" {
 
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
-  name     = "vwan-ri-terraform-rg"
+  name     = "vwan-ri-terraform-rg-2"
   location = "West Europe"
 }
 #Create a virtual wan
@@ -620,6 +620,9 @@ resource "azurerm_bastion_host" "spoke1-bastion" {
   name                = "spoke1-bastion"
   location            = azurerm_virtual_network.spoke1.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku = "Standard"
+  shareable_link_enabled = true
+  ip_connect_enabled = true
 
   ip_configuration {
     name                 = "configuration"
@@ -631,6 +634,9 @@ resource "azurerm_bastion_host" "onprem-bastion" {
   name                = "onprem-bastion"
   location            = azurerm_virtual_network.onprem.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku = "Standard"
+  shareable_link_enabled = true
+  ip_connect_enabled = true
 
   ip_configuration {
     name                 = "configuration"
@@ -642,6 +648,9 @@ resource "azurerm_bastion_host" "onprem2-bastion" {
   name                = "onprem2-bastion"
   location            = azurerm_virtual_network.onprem2.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku = "Standard"
+  shareable_link_enabled = true
+  ip_connect_enabled = true
 
   ip_configuration {
     name                 = "configuration"
