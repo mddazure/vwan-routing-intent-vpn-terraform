@@ -15,7 +15,7 @@ provider "azapi" {
 
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
-  name     = "vwan-ri-terraform-rg-2"
+  name     = "vwan-ri-terraform-rg"
   location = "West Europe"
 }
 #Create a virtual wan
@@ -106,8 +106,8 @@ resource "azurerm_vpn_gateway" "demo-we-hub-vpngw" {
 resource "azurerm_virtual_hub" "demo-eastus-hub" {
   name                = "demo-eastus-hub"
   resource_group_name = azurerm_resource_group.rg.name
-  #location            = "eastus" -> change when interregion available
-  location            = "westeurope"
+  location            = "eastus" #-> change when interregion available
+  #location            = "westeurope"
   virtual_wan_id      = azurerm_virtual_wan.demo-vwan.id
   address_prefix     = "192.168.1.0/24"
 }
